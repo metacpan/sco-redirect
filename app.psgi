@@ -55,7 +55,7 @@ builder {
       return $app->($env)
         unless $path =~ m{^/~};
 
-      my ($author, $dist, $path)
+      my ($author, $dist, $file_path)
         = $path =~ m{^/\~([^/]+)(?:/?|/([^/]+)(?:/?|/(.+)))$};
       $author = uc $author;
 
@@ -65,18 +65,18 @@ builder {
       my $release = dist_lookup($dist, $author);
 
       return redirect "release/$author/$release"
-        if !defined $path;
+        if !defined $file_path;
 
-      return redirect "module/$author/$release/$path";
-        if has_pod($author, $dist, $path);
+      return redirect "module/$author/$release/$file_path"
+        if has_pod($author, $dist, $file_path);
 
       # XXX: should this be a raw link?
-      return redirect "source/$author/$release/$path";
+      return redirect "source/$author/$release/$file_path";
     };
   };
   mount '/perldoc' => sub {
     my $env = shift;
-    my $url
+
     return redirect "/pod/$env->{QUERY_STRING}", 1
       if length $env->{QUERY_STRING};
 
@@ -92,7 +92,7 @@ builder {
     return redirect ''
       if $path =~ m{^/?$};
 
-    my ($author, $dist, $path) 
+    my ($author, $dist, $file_path) 
       = $path =~ m{^/([^/]+)(?:/?|/([^/]+)(?:/?|/(.+)))$};
     $author = uc $author;
 
@@ -104,9 +104,9 @@ builder {
     my $release = dist_lookup($dist, $author);
 
     return redirect "source/$author/$release"
-      if !defined $path;
+      if !defined $file_path;
 
-    return redirect "source/$author/$release/$path";
+    return redirect "source/$author/$release/$file_path";
   };
   mount '/dist' => sub {
     my $env = shift;
@@ -114,29 +114,29 @@ builder {
     return redirect ''
       if $path =~ m{^/?$};
 
-    my ($dist, $path) 
+    my ($dist, $file_path) 
       = $path =~ m{^/([^/]+)(?:/?|/(.+))$};
 
     if (is_dist($dist)) {
       return redirect "release/$dist"
-        if !defined $path;
+        if !defined $file_path;
 
-      return redirect "pod/distribution/$dist/$path"
-        if has_pod(undef, $dist, $path);
+      return redirect "pod/distribution/$dist/$file_path"
+        if has_pod(undef, $dist, $file_path);
 
       #XXX: we don't have an unversioned source URL
       my ($author, $release) = dist_lookup($dist);
-      return redirect "source/$author/$release/$path";
+      return redirect "source/$author/$release/$file_path";
     }
     else {
       my ($author, $release) = dist_lookup($dist);
       return redirect "release/$author/$release"
-        if !defined $path;
+        if !defined $file_path;
 
-      return redirect "pod/release/$author/$release/$path"
-        if has_pod($author, $dist, $path);
+      return redirect "pod/release/$author/$release/$file_path"
+        if has_pod($author, $dist, $file_path);
 
-      return redirect "source/$author/$release/$path";
+      return redirect "source/$author/$release/$file_path";
     }
   };
   mount '/CPAN' => sub {
@@ -164,14 +164,13 @@ builder {
       target => "$to_author/$to_release",
     );
 
-http://search.cpan.org/grep?cpanid=TIMB&release=DBI-1.634&string=welp&i=1&F=1&n=1&C=2
+    #http://search.cpan.org/grep?cpanid=TIMB&release=DBI-1.634&string=welp&i=1&F=1&n=1&C=2
   };
   mount '/grep' => sub {
     my $env = shift;
     my $req = Plack::Builder->new($env);
     my $author = $req->parameters->get('cpanid');
     my $release = $req->parameters->get('release');
-    my ($
   };
   mount '/' => sub {
     my $env = shift;
