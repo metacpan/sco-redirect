@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+use lib 'lib';
 use Plack::Builder;
 use Plack::Request;
 use MetaCPAN::SCORedirect;
@@ -36,7 +37,7 @@ sub {
       'Cache-Control'     => 'max-age=3600',
     ;
   }
-  elsif ($results->[0] == 200) {
+  elsif ($result->[0] == 200) {
     push @headers,
       'Cache-Control'     => 'max-age=3600',
     ;
