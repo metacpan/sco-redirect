@@ -314,7 +314,7 @@ sub api {
           authorized  => $rel->{authorized},
           released    => $rel->{date}.'Z',
           dist        => $rel->{distribution},
-          cpanid      => $author->{pauseid},
+          cpanid      => $rel->{author},
           version     => $rel->{version},
           archive     => $url,
           distvname   => $rel->{name},
