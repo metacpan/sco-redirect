@@ -140,7 +140,7 @@ sub rewrite_url {
     $result = rewrite($url, @params);
     1;
   } or do {
-    $result = ref $@ ? $@ : [ 500 ];
+    $result = ref $@ ? $@ : [ 500, undef, $@ ];
   };
   $result->[1] && $result->[1] =~ s{^/}{https://metacpan.org/};
   $result;
@@ -211,87 +211,7 @@ sub rewrite {
     elsif (m{^/api(?:/(.*))?$}) {
       return [ 301, 'https://fastapi.metacpan.org/' ]
         if !defined $1;
-      my ($type, $id) = split m{/}, $1, 2;
-      if ($type eq 'module') {
-        my $res = $ua->get('https://fastapi.metacpan.org/v1/module/'.$id);
-        return [ $res->{status} ]
-          unless $res->{status} == 200;
-        my $data = $J->decode($res->{content});
-        my $url = $data->{download_url};
-        my $author = $data->{author};
-        $url =~ s{.*?/authors/id/./../\Q$author\E/}{};
-        return [ $res->{status}, undef, {
-          status        => ($data->{maturity} eq 'released' ? 'stable' : 'testing'),
-          authorized    => $data->{authorized},
-          module        => $id,
-          cpanid        => $author,
-          version       => $data->{version},
-          abstract      => $data->{abstract},
-          distvname     => $data->{release},
-          archive       => $url,
-        } ];
-      }
-      elsif ( $type eq 'dist' ) {
-        #TODO
-        # http://search.cpan.org/api/dist/Dancer
-        my $res = $ua->get('https://fastapi.metacpan.org/v1/release/versions/'.$id);
-        return [ $res->{status} ]
-          unless $res->{status} == 200;
-        my $data = $J->decode($res->{content});
-        my $latest;
-        my @releases = map {
-          my $rel = $_;
-          if ($rel->{status} eq 'latest') {
-            $latest = $rel->{name};
-          }
-          my $url = $rel->{download_url};
-          my $author = $rel->{author};
-          $url =~ s{.*?/authors/id/./../\Q$author\E/}{};
-          {
-            dist        => $id,
-            status      => ($rel->{maturity} eq 'released' ? 'stable' : 'testing'),
-            released    => $rel->{date}.'Z',
-            authorized  => $rel->{authorized},
-            version     => $rel->{version},
-            archive     => $url,
-            distvname   => $rel->{name},
-            cpanid      => $author,
-          }
-        } @{$data->{releases}};
-        my $url = $data->{download_url};
-        my $author = $data->{author};
-      }
-      elsif ( $type eq 'author' ) {
-        my $author_res = $ua->get('https://fastapi.metacpan.org/v1/author/'.$id);
-        return [ $author_res->{status} ]
-          unless $author_res->{status} == 200;
-        my $author = $J->decode($author_res->{content});
-        my $release_res = $ua->get('https://fastapi.metacpan.org/v1/release/all_by_author/'.$id);
-        my $releases = $release_res->{status} == 200 ? $J->decode($release_res->{content})->{releases} : [];
-        return [ $author_res->{status}, undef, {
-          cpanid => $author->{pauseid},
-          name => $author->{name},
-          releases => [ map {
-            my $rel = $_;
-            my $url = $rel->{download_url};
-            my $author = $rel->{author};
-            $url =~ s{.*?/authors/id/./../\Q$author\E/}{};
-            {
-              status      => ($rel->{maturity} eq 'released' ? 'stable' : 'testing'),
-              authorized  => $rel->{authorized},
-              released    => $rel->{date}.'Z',
-              dist        => $rel->{distribution},
-              cpanid      => $author->{pauseid},
-              version     => $rel->{version},
-              archive     => $url,
-              distvname   => $rel->{name},
-            }
-          } grep $_->{status} ne 'backpan', @$releases ],
-        }];
-      }
-      else {
-        return [ 404, undef, { error => 'Not found' } ];
-      }
+      return api("$1");
     }
     elsif (m{^/search(?:/.*)?$}) {
       my %params = @params;
@@ -320,6 +240,91 @@ sub rewrite {
     }
   }
   return [ 404 ];
+}
+
+sub api {
+  my ($url) = @_;
+  my ($type, $id) = split m{/}, $url, 2;
+  if ($type eq 'module') {
+    my $res = $ua->get('https://fastapi.metacpan.org/v1/module/'.$id);
+    return [ $res->{status} ]
+      unless $res->{status} == 200;
+    my $data = $J->decode($res->{content});
+    my $url = $data->{download_url};
+    my $author = $data->{author};
+    $url =~ s{.*?/authors/id/./../\Q$author\E/}{};
+    return [ $res->{status}, undef, {
+      status        => ($data->{maturity} eq 'released' ? 'stable' : 'testing'),
+      authorized    => $data->{authorized},
+      module        => $id,
+      cpanid        => $author,
+      version       => $data->{version},
+      abstract      => $data->{abstract},
+      distvname     => $data->{release},
+      archive       => $url,
+    } ];
+  }
+  elsif ( $type eq 'dist' ) {
+    my $res = $ua->get('https://fastapi.metacpan.org/v1/release/versions/'.$id);
+    return [ $res->{status} ]
+      unless $res->{status} == 200;
+    my $data = $J->decode($res->{content});
+    my $latest;
+    my @releases = map {
+      my $rel = $_;
+      if ($rel->{status} eq 'latest') {
+        $latest = $rel->{name};
+      }
+      my $url = $rel->{download_url};
+      my $author = $rel->{author};
+      $url =~ s{.*?/authors/id/./../\Q$author\E/}{};
+      {
+        dist        => $id,
+        status      => ($rel->{maturity} eq 'released' ? 'stable' : 'testing'),
+        released    => $rel->{date}.'Z',
+        authorized  => $rel->{authorized},
+        version     => $rel->{version},
+        archive     => $url,
+        distvname   => $rel->{name},
+        cpanid      => $author,
+      }
+    } grep $_->{status} ne 'backpan', @{$data->{releases}};
+    return [ $res->{status}, undef, {
+      latest => $latest,
+      releases => \@releases,
+    } ];
+  }
+  elsif ( $type eq 'author' ) {
+    my $author_res = $ua->get('https://fastapi.metacpan.org/v1/author/'.$id);
+    return [ $author_res->{status} ]
+      unless $author_res->{status} == 200;
+    my $author = $J->decode($author_res->{content});
+    my $release_res = $ua->get('https://fastapi.metacpan.org/v1/release/all_by_author/'.$id);
+    my $releases = $release_res->{status} == 200 ? $J->decode($release_res->{content})->{releases} : [];
+    return [ $author_res->{status}, undef, {
+      cpanid => $author->{pauseid},
+      name => $author->{name},
+      releases => [ map {
+        my $rel = $_;
+        my $url = $rel->{download_url};
+        my $author = $rel->{author};
+        $url =~ s{.*?/authors/id/./../\Q$author\E/}{};
+        {
+          status      => ($rel->{maturity} eq 'released' ? 'stable' : 'testing'),
+          authorized  => $rel->{authorized},
+          released    => $rel->{date}.'Z',
+          dist        => $rel->{distribution},
+          cpanid      => $author->{pauseid},
+          version     => $rel->{version},
+          archive     => $url,
+          distvname   => $rel->{name},
+        }
+      } grep $_->{status} ne 'backpan', @$releases ],
+    }];
+  }
+  else {
+    return [ 404, undef, { error => 'Not found' } ];
+  }
 }
 
 sub src {
