@@ -8,3 +8,4 @@ requires 'WWW::Form::UrlEncoded';
 requires 'JSON::MaybeXS';
 requires 'Cpanel::JSON::XS';
 test_requires 'Test::More';
+test_requires 'Test::Differences';
