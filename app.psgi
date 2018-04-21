@@ -31,5 +31,15 @@ sub {
     $body //= 'Unhandled';
   }
   push @headers, 'Content-Type' => $content_type;
+  if ($result->[0] == 302) {
+    push @headers,
+      'Cache-Control'     => 'max-age=3600',
+    ;
+  }
+  elsif ($results->[0] == 200) {
+    push @headers,
+      'Cache-Control'     => 'max-age=3600',
+    ;
+  }
   return [ $result->[0], \@headers, [ $body ] ];
 };
