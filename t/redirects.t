@@ -85,28 +85,7 @@ my @checks = (
     => [ 301, 'https://metacpan.org/pod/release/JROBINSON/DBIx-Class-Tutorial-0.0001/lib/DBIx/Class/Tutorial.pod' ],
   '/perldoc/DBIx::Class::Tutorial'
     => [ 301, 'https://metacpan.org/pod/release/JROBINSON/DBIx-Class-Tutorial-0.0001/lib/DBIx/Class/Tutorial.pod' ],
-
-#  '/api/module/Dancer' => [ 200, undef, {
-#  } ],
-
-#  '/api/dist/Dancer' => [ 200, undef, {
-#  } ],
-
-#  '/api/author/Dancer' => [ 200, undef, {
-#  } ],
 );
-
-
-=pod
-
-    elsif (m{^/api(?:/(.*))?$}) {
-      # TODO
-      # http://search.cpan.org/api/module/Dancer
-      # http://search.cpan.org/api/dist/Dancer
-      # http://search.cpan.org/api/author/SUKRIA
-    }
-
-=cut
 
 while (@checks) {
   my ($sco, $meta) = (shift @checks, shift @checks);
