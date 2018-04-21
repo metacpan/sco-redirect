@@ -5,3 +5,6 @@ requires 'HTTP::Tiny';
 requires 'Plack::Builder';
 requires 'Plack::Request';
 requires 'WWW::Form::UrlEncoded';
+requires 'JSON::MaybeXS';
+requires 'Cpanel::JSON::XS';
+test_requires 'Test::More';
