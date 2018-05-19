@@ -7,5 +7,7 @@ requires 'Plack::Request';
 requires 'WWW::Form::UrlEncoded';
 requires 'JSON::MaybeXS';
 requires 'Cpanel::JSON::XS';
+requires 'IO::Socket::SSL' => 1.42;
+requires 'Net::SSLeay' => 1.49;
 test_requires 'Test::More';
 test_requires 'Test::Differences';

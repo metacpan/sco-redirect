@@ -397,6 +397,22 @@ DISTRIBUTIONS
       IO::Socket 0
       Socket 1.97
       Test::More 0.88
+  IO-Socket-SSL-2.056
+    pathname: S/SU/SULLR/IO-Socket-SSL-2.056.tar.gz
+    provides:
+      IO::Socket::SSL 2.056
+      IO::Socket::SSL::Intercept 2.056
+      IO::Socket::SSL::OCSP_Cache 2.056
+      IO::Socket::SSL::OCSP_Resolver 2.056
+      IO::Socket::SSL::PublicSuffix undef
+      IO::Socket::SSL::SSL_Context 2.056
+      IO::Socket::SSL::SSL_HANDLE 2.056
+      IO::Socket::SSL::Session_Cache 2.056
+      IO::Socket::SSL::Utils 2.014
+    requirements:
+      ExtUtils::MakeMaker 0
+      Net::SSLeay 1.46
+      Scalar::Util 0
   IPC-Signal-1.00
     pathname: R/RO/ROSCH/IPC-Signal-1.00.tar.gz
     provides:
@@ -529,6 +545,16 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
+  Net-SSLeay-1.85
+    pathname: M/MI/MIKEM/Net-SSLeay-1.85.tar.gz
+    provides:
+      Net::SSLeay 1.85
+      Net::SSLeay::Handle 0.61
+    requirements:
+      ExtUtils::MakeMaker 6.36
+      MIME::Base64 0
+      Test::More 0.60_01
+      perl 5.005
   POSIX-strftime-Compiler-0.42
     pathname: K/KA/KAZEBURO/POSIX-strftime-Compiler-0.42.tar.gz
     provides:
