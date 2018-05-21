@@ -18,7 +18,7 @@ my $J = JSON::MaybeXS->new(utf8 => 1, pretty => 1, canonical => 1);
 has user_agent => (is => 'ro', default => 'metacpan-sco/'.$VERSION);
 has ua => (is => 'lazy', default => sub {
   my $self = shift;
-  HTTP::Tiny->new(agent => $self->user_agent);
+  HTTP::Tiny->new(agent => $self->user_agent, verify_SSL => 1);
 });
 has api_url => (is => 'ro', default => 'https://fastapi.metacpan.org/v1/');
 has app => (is => 'lazy');
