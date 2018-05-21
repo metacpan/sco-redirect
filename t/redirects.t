@@ -87,12 +87,14 @@ my @checks = (
     => [ 301, 'https://metacpan.org/pod/release/JROBINSON/DBIx-Class-Tutorial-0.0001/lib/DBIx/Class/Tutorial.pod' ],
 );
 
+my $redirect = MetaCPAN::SCORedirect->new;
+
 while (@checks) {
   my ($sco, $meta) = (shift @checks, shift @checks);
   local $TODO = 'dev releases not working yet'
     if $sco =~ /DBIx..?Class..?Tutorial/;
   my ($sco_path, $sco_query) = split /\?/, $sco, 2;
-  my $got = MetaCPAN::SCORedirect::rewrite_url($sco_path, $sco_query);
+  my $got = $redirect->rewrite_url($sco_path, $sco_query);
   is $got->[0], $meta->[0], 'correct response code for '.$sco;
   is $got->[1], $meta->[1], 'correct rewrite for '.$sco;
 }

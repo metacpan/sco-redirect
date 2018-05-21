@@ -9,5 +9,8 @@ requires 'JSON::MaybeXS';
 requires 'Cpanel::JSON::XS';
 requires 'IO::Socket::SSL' => 1.42;
 requires 'Net::SSLeay' => 1.49;
+requires 'URL::Encode';
+requires 'URL::Encode::XS';
+requires 'Moo';
 test_requires 'Test::More';
 test_requires 'Test::Differences';

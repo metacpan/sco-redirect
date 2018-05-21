@@ -5,21 +5,71 @@ use warnings;
 our $VERSION = '0.001001';
 $VERSION =~ tr/_//d;
 
-use HTTP::Tiny;
+use HTTP::Tiny ();
 use WWW::Form::UrlEncoded qw(parse_urlencoded build_urlencoded);
-use CPAN::DistnameInfo;
-use JSON::MaybeXS;
-use Data::Dumper;
+use CPAN::DistnameInfo ();
+use JSON::MaybeXS ();
+use URL::Encode qw(url_encode);
 
-my $ua = HTTP::Tiny->new(agent => "metacpan-sco/$VERSION");
+use Moo;
+
 my $J = JSON::MaybeXS->new(utf8 => 1, pretty => 1, canonical => 1);
+
+has user_agent => (is => 'ro', default => 'metacpan-sco/'.$VERSION);
+has ua => (is => 'lazy', default => sub {
+  my $self = shift;
+  HTTP::Tiny->new(agent => $self->user_agent);
+});
+has api_url => (is => 'ro', default => 'https://fastapi.metacpan.org/v1/');
+has app => (is => 'lazy');
+
+sub _build_app {
+  my $self = shift;
+  sub {
+    my $env = shift;
+    my $result = $self->rewrite_url($env->{PATH_INFO}//'/', $env->{QUERY_STRING});
+    my $body;
+    my @headers;
+    my $content_type = 'text/plain';
+    if ($result->[1]) {
+      push @headers, 'Location' => $result->[1];
+      $body = 'Moved';
+    }
+    if ($result->[2]) {
+      $body = $J->encode($result->[2]);
+      $content_type = 'application/json';
+    }
+    if ($result->[0] == 404) {
+      $body //= 'Not found';
+    }
+    elsif ($result->[0] == 500) {
+      $body //= 'Internal server error';
+    }
+    else {
+      $body //= 'Unhandled';
+    }
+    push @headers, 'Content-Type' => $content_type;
+    if ($result->[0] == 302) {
+      push @headers,
+        'Cache-Control'     => 'max-age=3600',
+      ;
+    }
+    elsif ($result->[0] == 200) {
+      push @headers,
+        'Cache-Control'     => 'max-age=3600',
+      ;
+    }
+    return [ $result->[0], \@headers, [ $body ] ];
+  }
+};
+
 
 sub is_dist {
   $_[0] !~ /-[0-9][0-9._a-zA-Z]+$/;
 }
 
 sub find_dev {
-  my ($dist, $author) = @_;
+  my ($self, $dist, $author) = @_;
   my $query = {
     query => {
       bool => {
@@ -41,7 +91,7 @@ sub find_dev {
     size => 1,
     fields => [ qw(name author) ],
   };
-  my $res = $ua->post('https://fastapi.metacpan.org/v1/release', {
+  my $res = $self->ua->post($self->api_url.'release', {
     content => $J->encode($query),
   });
   die [ $res->{status} ]
@@ -54,12 +104,11 @@ sub find_dev {
 }
 
 sub dist_lookup {
-  my ($dist, $author) = @_;
+  my ($self, $dist, $author) = @_;
   my $release;
   my $is_latest;
   if (is_dist($dist)) {
-    #XXX escape
-    my $res = $ua->get('https://fastapi.metacpan.org/v1/release/latest_by_distribution/'.$dist);
+    my $res = $self->ua->get($self->api_url.'release/latest_by_distribution/'.url_encode($dist));
     my $latest = $res->{status} == 200 && $J->decode($res->{content})->{release};
     if ($author) {
       if ($latest && $latest->{author} eq $author) {
@@ -67,7 +116,7 @@ sub dist_lookup {
         $is_latest = 1;
       }
       else {
-        ($release, $author) = find_dev($dist, $author);
+        ($release, $author) = $self->find_dev($dist, $author);
         # XXX: search for latest by author
       }
     }
@@ -78,7 +127,7 @@ sub dist_lookup {
         $is_latest = 1;
       }
       else {
-        ($release, $author) = find_dev($dist);
+        ($release, $author) = $self->find_dev($dist);
       }
     }
   }
@@ -107,7 +156,7 @@ sub dist_lookup {
         fields => [ qw(author) ],
       };
       my $json = $J->encode($query);
-      my $res = $ua->post('https://fastapi.metacpan.org/v1/release', {
+      my $res = $self->ua->post($self->api_url.'release', {
         content => $json,
       });
       die [ $res->{status} ]
@@ -120,24 +169,20 @@ sub dist_lookup {
   return wantarray ? ($release, $author, $is_latest) : $release;
 }
 
-sub find_module {
-  
-}
-
 sub has_pod {
-  my ($author, $dist, $path) = @_;
+  my ($self, $author, $dist, $path) = @_;
   # TODO: pod lookup
   return $path =~ /\.(?:pm|pod)$/;
 }
 
 sub rewrite_url {
-  my ($url, $query) = @_;
+  my ($self, $url, $query) = @_;
   my @params = length $query ? parse_urlencoded($query) : ();
   pop @params
     if @params == 2 && $query !~ /=/;
   my $result;
   eval {
-    $result = rewrite($url, @params);
+    $result = $self->rewrite($url, @params);
     1;
   } or do {
     $result = ref $@ ? $@ : [ 500, undef, $@ ];
@@ -147,10 +192,10 @@ sub rewrite_url {
 }
 
 sub rewrite {
-  my ($path, @params) = @_;
+  my ($self, $path, @params) = @_;
   for ($path) {
     if (m{^/(~.*)}) {
-      return tilde("$1");
+      return $self->tilde("$1");
     }
     elsif (m{^/perldoc(?:/([^/]+)(/.*)?)?$}) {
       if (@params == 1) {
@@ -167,10 +212,10 @@ sub rewrite {
       }
     }
     elsif (m{^/src/(.*)$}) {
-      return length $1 ? src("$1") : [ 301, '/' ];
+      return length $1 ? $self->src("$1") : [ 301, '/' ];
     }
     elsif (m{^/dist(?:/(.*))?$}) {
-      return length $1 ? dist("$1") : [ 301, '/' ];
+      return length $1 ? $self->dist("$1") : [ 301, '/' ];
     }
     elsif (m{^/CPAN(?:/(.*))?$}) {
       return [ 301, 'https://cpan.metacpan.org/' . (length $1 ? $1 : '') ];
@@ -186,8 +231,8 @@ sub rewrite {
       my %params = @params;
       return [ 404 ]
         unless $params{from} && $params{to};
-      my ($from_release, $from_author) = dist_lookup($params{from});
-      my ($to_release, $to_author) = dist_lookup($params{to});
+      my ($from_release, $from_author) = $self->dist_lookup($params{from});
+      my ($to_release, $to_author) = $self->dist_lookup($params{to});
 
       return [ 301, '/diff/file?'.build_urlencoded(
         target => "$to_author/$to_release",
@@ -211,7 +256,7 @@ sub rewrite {
     elsif (m{^/api(?:/(.*))?$}) {
       return [ 301, 'https://fastapi.metacpan.org/' ]
         if !defined $1;
-      return api("$1");
+      return $self->api("$1");
     }
     elsif (m{^/search(?:/.*)?$}) {
       my %params = @params;
@@ -243,10 +288,10 @@ sub rewrite {
 }
 
 sub api {
-  my ($url) = @_;
+  my ($self, $url) = @_;
   my ($type, $id) = split m{/}, $url, 2;
   if ($type eq 'module') {
-    my $res = $ua->get('https://fastapi.metacpan.org/v1/module/'.$id);
+    my $res = $self->ua->get('https://fastapi.metacpan.org/v1/module/'.url_encode($id));
     return [ $res->{status} ]
       unless $res->{status} == 200;
     my $data = $J->decode($res->{content});
@@ -265,7 +310,7 @@ sub api {
     } ];
   }
   elsif ( $type eq 'dist' ) {
-    my $res = $ua->get('https://fastapi.metacpan.org/v1/release/versions/'.$id);
+    my $res = $self->ua->get($self->api_url.'release/versions/'.url_encode($id));
     return [ $res->{status} ]
       unless $res->{status} == 200;
     my $data = $J->decode($res->{content});
@@ -295,11 +340,11 @@ sub api {
     } ];
   }
   elsif ( $type eq 'author' ) {
-    my $author_res = $ua->get('https://fastapi.metacpan.org/v1/author/'.$id);
+    my $author_res = $self->ua->get($self->api_url.'author/'.url_encode($id));
     return [ $author_res->{status} ]
       unless $author_res->{status} == 200;
     my $author = $J->decode($author_res->{content});
-    my $release_res = $ua->get('https://fastapi.metacpan.org/v1/release/all_by_author/'.$id);
+    my $release_res = $self->ua->get($self->api_url.'release/all_by_author/'.url_encode($id));
     my $releases = $release_res->{status} == 200 ? $J->decode($release_res->{content})->{releases} : [];
     return [ $author_res->{status}, undef, {
       cpanid => $author->{pauseid},
@@ -328,7 +373,7 @@ sub api {
 }
 
 sub src {
-  my $path = shift;
+  my ($self, $path) = @_;
 
   # http://cpansearch.perl.org/src/TIMB/DBI-1.636/
   #
@@ -339,7 +384,7 @@ sub src {
   return [ 301, "/author/$author" ]
     if !defined $dist;
 
-  (my $release, $author) = dist_lookup($dist, $author);
+  (my $release, $author) = $self->dist_lookup($dist, $author);
 
   my $code = $release eq $dist ? 301 : 302;
 
@@ -351,7 +396,7 @@ sub src {
 }
 
 sub tilde {
-  my $path = shift;
+  my ($self, $path) = @_;
 
   my ($author, $dist, $file_path)
     = $path =~ m{^\~([^/]+)(?:/?|/([^/]+)(?:/?|/(.+)))$};
@@ -360,28 +405,28 @@ sub tilde {
   return [ 301, "/author/$author" ],
     if !defined $dist;
 
-  dist_path($dist, $author, $file_path);
+  $self->dist_path($dist, $author, $file_path);
 }
 
 sub dist {
-  my $path = shift;
+  my ($self, $path) = @_;
   my ($dist, $file_path)
     = $path =~ m{^([^/]+)(?:/?|/(.+))$};
 
-  dist_path($dist, undef, $file_path);
+  $self->dist_path($dist, undef, $file_path);
 }
 
 sub dist_path {
-  my ($dist, $author, $file_path) = @_;
+  my ($self, $dist, $author, $file_path) = @_;
 
-  (my $release, $author, my $is_latest) = dist_lookup($dist, $author);
+  (my $release, $author, my $is_latest) = $self->dist_lookup($dist, $author);
 
   if (is_dist($dist) && $is_latest) {
     return [ 301, "/release/$dist" ]
       if !defined $file_path;
 
     return [ 301, "/pod/distribution/$dist/$file_path" ]
-      if has_pod($author, $dist, $file_path);
+      if $self->has_pod($author, $dist, $file_path);
 
     return [ 302, "/source/$author/$release/$file_path" ];
   }
@@ -392,7 +437,7 @@ sub dist_path {
     if !defined $file_path;
 
   return [ $code, "/pod/release/$author/$release/$file_path" ]
-    if has_pod($author, $dist, $file_path);
+    if $self->has_pod($author, $dist, $file_path);
 
   # XXX: should this be a raw link?
   return [ $code, "/source/$author/$release/$file_path" ];
