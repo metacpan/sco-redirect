@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Plack::Util;
+use Plack::Test;
+use File::Basename;
+use URI;
+use HTTP::Request::Common qw(GET);
+
+use File::Basename ();
+my $root_dir;
+BEGIN {
+  $root_dir = File::Basename::dirname(__FILE__);
+}
+
+my $app = Plack::Util::load_psgi("$root_dir/../app.psgi");
+my $test = Plack::Test->create($app);
+
+for my $url (@ARGV) {
+  my $uri = URI->new($url);
+  my $path = $uri->path_query;
+  my $res = $test->request(GET $path);
+  print '  ' . $res->status_line . "\n";
+  print '  Location: ' . $res->header('Location') . "\n"
+    if $res->header('Location');
+  my $body = $res->content;
+  $body =~ s/^/  /gm;
+  print $body . "\n";
+}
