@@ -66,7 +66,8 @@ sub _build_app {
 
 
 sub is_dist {
-  $_[0] !~ /-[0-9][0-9._a-zA-Z]+$/;
+  my $info = CPAN::DistnameInfo->new($_[0].'.tar.gz');
+  return !defined $info->version;
 }
 
 sub find_dev {
