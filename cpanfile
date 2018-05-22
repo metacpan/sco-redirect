@@ -12,5 +12,7 @@ requires 'Net::SSLeay' => 1.49;
 requires 'URL::Encode';
 requires 'URL::Encode::XS';
 requires 'Moo';
+requires 'Log::Log4perl';
+requires 'Log::Contextual';
 test_requires 'Test::More';
 test_requires 'Test::Differences';

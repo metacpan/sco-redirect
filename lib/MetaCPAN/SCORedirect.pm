@@ -10,6 +10,7 @@ use WWW::Form::UrlEncoded qw(parse_urlencoded build_urlencoded);
 use CPAN::DistnameInfo ();
 use JSON::MaybeXS ();
 use URL::Encode qw(url_encode);
+use Log::Contextual::Easy::Default;
 
 use Moo;
 
