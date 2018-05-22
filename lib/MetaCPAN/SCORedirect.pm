@@ -433,11 +433,11 @@ sub src {
 
   my $code = $release eq $dist ? 301 : 302;
 
-  return [ $code, "/source/$author/$release" ]
+  return [ $code, "/source/$author/$release".($self->raw_source_link ? '?raw=1' : '') ]
     if !defined $file_path;
 
   $file_path =~ s{/\z}{};
-  return [ $code, "/source/$author/$release/$file_path" ];
+  return [ $code, "/source/$author/$release/$file_path".($self->raw_source_link ? '?raw=1' : '') ];
 }
 
 sub tilde {
@@ -473,7 +473,7 @@ sub dist_path {
     return [ 301, "/pod/distribution/$dist/$file_path" ]
       if $self->has_pod($author, $release, $file_path);
 
-    return [ 302, "/source/$author/$release/$file_path" ];
+    return [ 301, "/release/$dist/source/$file_path".($self->raw_source_link ? '?raw=1' : '') ];
   }
 
   my $code = $dist eq $release ? 301 : 302;
@@ -484,8 +484,7 @@ sub dist_path {
   return [ $code, "/pod/release/$author/$release/$file_path" ]
     if $self->has_pod($author, $release, $file_path);
 
-  # XXX: should this be a raw link?
-  return [ $code, "/source/$author/$release/$file_path" ];
+  return [ $code, "/source/$author/$release/$file_path".($self->raw_source_link ? '?raw=1' : '') ];
 }
 
 1;
