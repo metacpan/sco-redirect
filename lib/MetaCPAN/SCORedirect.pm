@@ -173,8 +173,11 @@ sub dist_lookup {
 
 sub has_pod {
   my ($self, $author, $dist, $path) = @_;
-  # TODO: pod lookup
-  return $path =~ /\.(?:pm|pod)$/;
+  my $res = $self->ua->get($self->api_url."file/$author/$dist/$path");
+  return 0
+    unless $res->{status} == 200;
+  my $file = $J->decode($res->{content});
+  return !!($file->{pod_lines} && @{$file->{pod_lines}});
 }
 
 sub rewrite_url {
