@@ -140,7 +140,7 @@ sub dist_lookup {
   }
   else {
     $release = $dist;
-    if (wantarray && !$author) {
+    if (wantarray) {
       my $query = {
         query => {
           bool => {
@@ -160,7 +160,7 @@ sub dist_lookup {
         },
         sort => [ { date => 'desc' } ],
         size => 1,
-        fields => [ qw(author) ],
+        fields => [ qw(status author) ],
       };
       my $json = $J->encode($query);
       my $res = $self->ua->post($self->api_url.'release', {
@@ -171,7 +171,7 @@ sub dist_lookup {
 
       my $rel = $J->decode($res->{content})->{hits}{hits}[0]{fields};
       Dlog_debug { "found release from $release: $_" } $rel;
-      $author = $rel->{author};
+      $author ||= $rel->{author};
     }
   }
   log_debug { "found $author $release ".($is_latest ? 'latest' : 'not latest') };
