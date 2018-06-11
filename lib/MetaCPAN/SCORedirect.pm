@@ -208,7 +208,7 @@ sub rewrite_url {
 sub rewrite {
   my ($self, $path, @params) = @_;
   for ($path) {
-    if (m{^/(~.*)}) {
+    if (m{^/~(.*)}) {
       return $self->tilde("$1");
     }
     elsif (m{^/perldoc(?:/([^/]+)(/.*)?)?$}) {
@@ -284,6 +284,16 @@ sub rewrite {
         ($page > 1 ? (p => $page) : ()),
         ($page > 1 || $params{n} ? (size => $page_size) : ()),
       ) ];
+    }
+    elsif (m{^/author(?:/(.*))?$}) {
+      my ($author) = $1;
+      if (length $author) {
+        return $self->tilde($author);
+      }
+      my $prefix = $params[0];
+      return [ 301, '/authors' ]
+        if !defined $prefix;
+      return [ 301, '/authors/'.uc substr($prefix, 0, 1) ];
     }
     else {
       return [ 301,
@@ -413,7 +423,7 @@ sub tilde {
   my ($self, $path) = @_;
 
   my ($author, $dist, $file_path)
-    = $path =~ m{^\~([^/]+)(?:/?|/([^/]+)(?:/?|/(.+)))$};
+    = $path =~ m{^([^/]+)(?:/?|/([^/]+)(?:/?|/(.+)))$};
   $author = uc $author;
 
   return [ 301, "/author/$author" ],
@@ -462,8 +472,6 @@ sub dist_path {
 __END__
 
 ## medium
-# http://search.cpan.org/author/
-# http://search.cpan.org/author/?Q
 # github/rt count classifications
 # license link
 

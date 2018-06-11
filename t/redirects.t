@@ -26,6 +26,13 @@ my @checks = (
   '/feedback/guff'                                => [ 301, 'https://metacpan.org/about/contact' ],
   '/recent'                                       => [ 301, 'https://metacpan.org/recent' ],
   '/recent/guff'                                  => [ 301, 'https://metacpan.org/recent' ],
+  '/author'                                       => [ 301, 'https://metacpan.org/authors' ],
+  '/author/'                                      => [ 301, 'https://metacpan.org/authors' ],
+  '/author?A'                                     => [ 301, 'https://metacpan.org/authors/A' ],
+  '/author/?A'                                    => [ 301, 'https://metacpan.org/authors/A' ],
+  '/author/?AB'                                   => [ 301, 'https://metacpan.org/authors/A' ],
+  '/author/?AB&foo=1'                             => [ 301, 'https://metacpan.org/authors/A' ],
+  '/author/?AB&B'                                 => [ 301, 'https://metacpan.org/authors/A' ],
   '/diff'                                         => [ 404 ],
   '/diff?from=Moo-2.003003&to=Moo-2.003004'
     => [ 301, 'https://metacpan.org/diff/file?target=HAARG%2FMoo-2.003004&source=HAARG%2FMoo-2.003003' ],
@@ -42,10 +49,21 @@ my @checks = (
   '/rss/search.rss'                               => [ 301, 'https://metacpan.org/feed/recent?format=rss' ],
   '/rss/search.rss/guff'                          => [ 404 ],
 
+  '/author/haarg'                                 => [ 301, 'https://metacpan.org/author/HAARG' ],
+  '/author/haarg/'                                => [ 301, 'https://metacpan.org/author/HAARG' ],
+  '/author/HAARG'                                 => [ 301, 'https://metacpan.org/author/HAARG' ],
+
+  '/author/haarg/Moo-2.003004/'                   => [ 301, 'https://metacpan.org/release/HAARG/Moo-2.003004' ],
+  '/author/haarg/Moo-2.003004/lib/Moo.pm'         => [ 301, 'https://metacpan.org/pod/release/HAARG/Moo-2.003004/lib/Moo.pm' ],
+  '/author/haarg/Moo/'                            => [ 301, 'https://metacpan.org/release/Moo' ],
+  '/author/haarg/Moo/lib/Moo.pm'                  => [ 301, 'https://metacpan.org/pod/distribution/Moo/lib/Moo.pm' ],
+  '/author/haarg/Moo/lib/Moo/Object.pm'           => [ 301, 'https://metacpan.org/release/Moo/source/lib/Moo/Object.pm?raw=1' ],
+  '/author/haarg/Moo/Changes'                     => [ 301, 'https://metacpan.org/release/Moo/source/Changes?raw=1' ],
+  '/author/ether/Moose-2.2010/dist.ini'           => [ 301, 'https://metacpan.org/source/ETHER/Moose-2.2010/dist.ini?raw=1' ],
+
   '/~haarg'                                       => [ 301, 'https://metacpan.org/author/HAARG' ],
   '/~haarg/'                                      => [ 301, 'https://metacpan.org/author/HAARG' ],
   '/~HAARG'                                       => [ 301, 'https://metacpan.org/author/HAARG' ],
-
 
   '/~haarg/Moo-2.003004/'                         => [ 301, 'https://metacpan.org/release/HAARG/Moo-2.003004' ],
   '/~haarg/Moo-2.003004/lib/Moo.pm'               => [ 301, 'https://metacpan.org/pod/release/HAARG/Moo-2.003004/lib/Moo.pm' ],
