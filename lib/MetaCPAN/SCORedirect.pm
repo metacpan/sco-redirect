@@ -72,6 +72,7 @@ sub is_dist {
 
 sub find_dev {
   my ($self, $dist, $author) = @_;
+  log_debug { "finding dev release for $dist by ".($author//'unknown author') };
   my $query = {
     query => {
       bool => {
@@ -100,6 +101,7 @@ sub find_dev {
     unless $res->{status} == 200;
 
   my $rel = $J->decode($res->{content});
+  Dlog_debug { "found dev release $_" } $rel;
   my $release = $rel->{hits}{hits}[0]{fields} or die [ 404 ];
 
   return ($release->{name}, $release->{author});
@@ -110,20 +112,23 @@ sub dist_lookup {
   my $release;
   my $is_latest;
   if (is_dist($dist)) {
+    log_debug { "looking up release for $dist by ".($author // 'unknown') };
     my $res = $self->ua->get($self->api_url.'release/latest_by_distribution/'.url_encode($dist));
     my $latest = $res->{status} == 200 && $J->decode($res->{content})->{release};
+    Dlog_debug { "latest release for $dist: $_" } $latest;
     if ($author) {
       if ($latest && $latest->{author} eq $author) {
+        log_debug { "latest release has matching author: $author" };
         $release = $latest->{name};
         $is_latest = 1;
       }
       else {
         ($release, $author) = $self->find_dev($dist, $author);
-        # XXX: search for latest by author
       }
     }
     else {
       if ($latest) {
+        log_debug { "using latest release" };
         $release = $latest->{name};
         $author = $latest->{author};
         $is_latest = 1;
@@ -164,19 +169,23 @@ sub dist_lookup {
       die [ $res->{status} ]
         unless $res->{status} == 200;
 
-      my $rel = $J->decode($res->{content});
-      $author = $rel->{hits}{hits}[0]{fields}{author};
+      my $rel = $J->decode($res->{content})->{hits}{hits}[0]{fields};
+      Dlog_debug { "found release from $release: $_" } $rel;
+      $author = $rel->{author};
     }
   }
+  log_debug { "found $author $release ".($is_latest ? 'latest' : 'not latest') };
   return wantarray ? ($release, $author, $is_latest) : $release;
 }
 
 sub has_pod {
   my ($self, $author, $dist, $path) = @_;
+  log_debug { "checking file/$author/$dist/$path" };
   my $res = $self->ua->get($self->api_url."file/$author/$dist/$path");
   return 0
     unless $res->{status} == 200;
   my $file = $J->decode($res->{content});
+  Dlog_debug { "checking for pod lines in $author/$dist/$path: $_" } $file->{pod_lines};
   return !!($file->{pod_lines} && @{$file->{pod_lines}});
 }
 
