@@ -293,7 +293,7 @@ sub rewrite {
         : m{^/faq\.html(?:/.*)?$}       ? '/about/faq'
         : m{^/feedback(?:/.*)?$}        ? '/about/contact'
         : m{^/pod2html(?:/.*)?$}        ? '/pod2html'
-        : m{^/rss/search\.rss$}         ? '/feed/recent?format=RSS&version=0.91' #XXX currently unsupported
+        : m{^/rss/search\.rss$}         ? '/feed/recent?format=rss'
         : return [ 404 ]
       ];
     }
