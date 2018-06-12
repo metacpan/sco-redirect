@@ -28,4 +28,8 @@ else {
 
 set_logger(Log::Log4perl->get_logger('MetaCPAN::SCORedirect'));
 
-MetaCPAN::SCORedirect->new->app;
+my $config = Config::ZOMG->open(
+  name => 'MetaCPAN::SCORedirect',
+  path => $root_dir,
+);
+MetaCPAN::SCORedirect->new($config)->app;

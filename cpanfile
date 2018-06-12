@@ -1,4 +1,6 @@
 requires 'CPAN::DistnameInfo';
+requires 'Config::Any';
+requires 'Config::General';
 requires 'Cpanel::JSON::XS';
 requires 'Gazelle';
 requires 'HTML::Entities';
