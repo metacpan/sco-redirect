@@ -471,7 +471,7 @@ sub dist_path {
       if !defined $file_path;
 
     return [ 301, "/pod/distribution/$dist/$file_path" ]
-      if $self->has_pod($author, $dist, $file_path);
+      if $self->has_pod($author, $release, $file_path);
 
     return [ 302, "/source/$author/$release/$file_path" ];
   }
@@ -482,7 +482,7 @@ sub dist_path {
     if !defined $file_path;
 
   return [ $code, "/pod/release/$author/$release/$file_path" ]
-    if $self->has_pod($author, $dist, $file_path);
+    if $self->has_pod($author, $release, $file_path);
 
   # XXX: should this be a raw link?
   return [ $code, "/source/$author/$release/$file_path" ];
