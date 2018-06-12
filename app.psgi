@@ -13,6 +13,7 @@ use MetaCPAN::SCORedirect;
 use Log::Contextual qw( set_logger );
 use Log::Log4perl ();
 use Log::Log4perl::Level ();
+use Config::ZOMG;
 
 if (
   my ($log_file) =
