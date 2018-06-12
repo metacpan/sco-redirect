@@ -19,10 +19,17 @@ my $J = JSON::MaybeXS->new(utf8 => 1, pretty => 1, canonical => 1);
 has user_agent => (is => 'ro', default => 'metacpan-sco/'.$VERSION);
 has ua => (is => 'lazy', default => sub {
   my $self = shift;
-  HTTP::Tiny->new(agent => $self->user_agent, verify_SSL => 1);
+  HTTP::Tiny->new(%{$self->ua_options}, agent => $self->user_agent);
+});
+has ua_options => (is => 'ro', default => sub {
+  +{
+    verify_SSL => 1,
+  };
 });
 has api_url => (is => 'ro', default => 'https://fastapi.metacpan.org/v1/');
 has app => (is => 'lazy');
+has raw_source_link => (is => 'ro', default => 1);
+has metacpan_url => (is => 'ro', default => 'https://metacpan.org/');
 
 sub _build_app {
   my $self = shift;
@@ -201,7 +208,8 @@ sub rewrite_url {
   } or do {
     $result = ref $@ ? $@ : [ 500, undef, $@ ];
   };
-  $result->[1] && $result->[1] =~ s{^/}{https://metacpan.org/};
+  my $mc = $self->metacpan_url;
+  $result->[1] && $result->[1] =~ s{^/}{$mc};
   $result;
 }
 
