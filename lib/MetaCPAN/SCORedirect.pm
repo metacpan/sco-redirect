@@ -286,7 +286,15 @@ sub rewrite {
       my $mode = $params{m} // $params{mode} // 'all'; # all, dist, module, author
       my $page_size = $params{n} || 100;
       my $page = int((($params{s} // 1) - 1) / ($page_size) + 1);
-      my $format = $params{format}; # XXX xml
+      my $format = uc($params{format} // '');
+      if ($format eq 'XML') {
+        return $self->search_xml({
+          query     => $query,
+          mode      => $mode,
+          page_size => $page_size,
+          page      => $page,
+        });
+      }
       return [ 301, '/search?'.build_urlencoded(
         q => $query,
         ($page > 1 ? (p => $page) : ()),
@@ -317,6 +325,11 @@ sub rewrite {
     }
   }
   return [ 404 ];
+}
+
+sub search_xml {
+  my ($self, $params) = @_;
+  return [ '501', undef, 'XML search not supported in search.cpan.org redirection' ];
 }
 
 sub api {
