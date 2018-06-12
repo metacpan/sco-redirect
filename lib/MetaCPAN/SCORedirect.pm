@@ -62,6 +62,11 @@ sub _build_app {
         'Cache-Control'     => 'max-age=3600',
       ;
     }
+    elsif ($result->[0] == 301) {
+      push @headers,
+        'Cache-Control'     => 'max-age='.(365*24*60*60),
+      ;
+    }
     elsif ($result->[0] == 200) {
       push @headers,
         'Cache-Control'     => 'max-age=3600',
