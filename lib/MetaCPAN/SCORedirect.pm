@@ -388,6 +388,10 @@ sub rewrite {
       my $page_size = $params{n} || 100;
       my $page = int((($params{s} // 1) - 1) / ($page_size) + 1);
       my $format = uc($params{format} // '');
+      # TODO: mode eq author
+      if ($mode eq 'dist' || $mode eq 'module') {
+        $query = "$mode:$query";
+      }
       if ($format eq 'XML') {
         return $self->search_xml({
           query     => $query,
