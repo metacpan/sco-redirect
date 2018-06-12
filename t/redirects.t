@@ -69,40 +69,40 @@ my @checks = (
   '/~haarg/Moo-2.003004/lib/Moo.pm'               => [ 301, 'https://metacpan.org/pod/release/HAARG/Moo-2.003004/lib/Moo.pm' ],
   '/~haarg/Moo/'                                  => [ 301, 'https://metacpan.org/release/Moo' ],
   '/~haarg/Moo/lib/Moo.pm'                        => [ 301, 'https://metacpan.org/pod/distribution/Moo/lib/Moo.pm' ],
-  '/~haarg/Moo/lib/Moo/Object.pm'                 => [ 301, 'https://metacpan.org/pod/distribution/Moo/lib/Moo/Object.pm' ],
-  '/~haarg/Moo/Changes'                           => [ 302, 'https://metacpan.org/source/HAARG/Moo-2.003004/Changes' ],
-  '/~ether/Moose-2.2010/dist.ini'                 => [ 301, 'https://metacpan.org/source/ETHER/Moose-2.2010/dist.ini' ],
+  '/~haarg/Moo/lib/Moo/Object.pm'                 => [ 301, 'https://metacpan.org/release/Moo/source/lib/Moo/Object.pm?raw=1' ],
+  '/~haarg/Moo/Changes'                           => [ 301, 'https://metacpan.org/release/Moo/source/Changes?raw=1' ],
+  '/~ether/Moose-2.2010/dist.ini'                 => [ 301, 'https://metacpan.org/source/ETHER/Moose-2.2010/dist.ini?raw=1' ],
   '/~mstrout/Moo/'                                => [ 302, 'https://metacpan.org/release/MSTROUT/Moo-1.003001' ],
 
   '/src/'                                         => [ 301, 'https://metacpan.org/' ],
   '/src/HAARG/'                                   => [ 301, 'https://metacpan.org/author/HAARG' ],
-  '/src/HAARG/Moo-2.003004/'                      => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004' ],
-  '/src/HAARG/Moo-2.003004/Changes'               => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/Changes' ],
-  '/src/HAARG/Moo-2.003004/lib'                   => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/lib' ],
-  '/src/HAARG/Moo-2.003004/lib/'                  => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/lib' ],
-  '/src/HAARG/Moo-2.003004/lib/Moo.pm'            => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/lib/Moo.pm' ],
+  '/src/HAARG/Moo-2.003004/'                      => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004?raw=1' ],
+  '/src/HAARG/Moo-2.003004/Changes'               => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/Changes?raw=1' ],
+  '/src/HAARG/Moo-2.003004/lib'                   => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/lib?raw=1' ],
+  '/src/HAARG/Moo-2.003004/lib/'                  => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/lib?raw=1' ],
+  '/src/HAARG/Moo-2.003004/lib/Moo.pm'            => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/lib/Moo.pm?raw=1' ],
 
   '/dist/'                                        => [ 301, 'https://metacpan.org/' ],
   '/dist/Moo'                                     => [ 301, 'https://metacpan.org/release/Moo' ],
   '/dist/Moo/'                                    => [ 301, 'https://metacpan.org/release/Moo' ],
   '/dist/Moo/lib/Moo.pm'                          => [ 301, 'https://metacpan.org/pod/distribution/Moo/lib/Moo.pm' ],
   '/dist/Moo/maint/Makefile.PL.include'
-    => [ 302, 'https://metacpan.org/source/HAARG/Moo-2.003004/maint/Makefile.PL.include' ],
-  '/dist/Moo/Changes'                             => [ 302, 'https://metacpan.org/source/HAARG/Moo-2.003004/Changes' ],
+    => [ 301, 'https://metacpan.org/release/Moo/source/maint/Makefile.PL.include?raw=1' ],
+  '/dist/Moo/Changes'                             => [ 301, 'https://metacpan.org/release/Moo/source/Changes?raw=1' ],
   '/dist/Moo-2.003004'                            => [ 301, 'https://metacpan.org/release/HAARG/Moo-2.003004' ],
   '/dist/Moo-2.003004/'                           => [ 301, 'https://metacpan.org/release/HAARG/Moo-2.003004' ],
   '/dist/Moo-2.003004/lib/Moo.pm'                 => [ 301, 'https://metacpan.org/pod/release/HAARG/Moo-2.003004/lib/Moo.pm' ],
-  '/dist/Moo-2.003004/maint/Makefile.PL.include'  => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/maint/Makefile.PL.include' ],
-  '/dist/Moo-2.003004/Changes'                    => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/Changes' ],
+  '/dist/Moo-2.003004/maint/Makefile.PL.include'  => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/maint/Makefile.PL.include?raw=1' ],
+  '/dist/Moo-2.003004/Changes'                    => [ 301, 'https://metacpan.org/source/HAARG/Moo-2.003004/Changes?raw=1' ],
 
   '/dist/DBIx-Class-Tutorial/'
-    => [ 301, 'https://metacpan.org/release/JROBINSON/DBIx-Class-Tutorial-0.0001' ],
+    => [ 302, 'https://metacpan.org/release/JROBINSON/DBIx-Class-Tutorial-0.0001' ],
   '/~jrobinson/DBIx-Class-Tutorial/'
-    => [ 301, 'https://metacpan.org/release/JROBINSON/DBIx-Class-Tutorial-0.0001' ],
+    => [ 302, 'https://metacpan.org/release/JROBINSON/DBIx-Class-Tutorial-0.0001' ],
   '/~jrobinson/DBIx-Class-Tutorial/lib/DBIx/Class/Tutorial.pod'
-    => [ 301, 'https://metacpan.org/pod/release/JROBINSON/DBIx-Class-Tutorial-0.0001/lib/DBIx/Class/Tutorial.pod' ],
+    => [ 302, 'https://metacpan.org/pod/release/JROBINSON/DBIx-Class-Tutorial-0.0001/lib/DBIx/Class/Tutorial.pod' ],
   '/perldoc/DBIx::Class::Tutorial'
-    => [ 301, 'https://metacpan.org/pod/release/JROBINSON/DBIx-Class-Tutorial-0.0001/lib/DBIx/Class/Tutorial.pod' ],
+    => [ 302, 'https://metacpan.org/pod/release/JROBINSON/DBIx-Class-Tutorial-0.0001/lib/DBIx/Class/Tutorial.pod' ],
 );
 
 my $redirect = MetaCPAN::SCORedirect->new;
