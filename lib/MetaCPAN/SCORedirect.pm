@@ -77,6 +77,20 @@ sub is_dist {
   return !defined $info->version;
 }
 
+sub api_call {
+  my ($self, $path, $body) = @_;
+  my $res;
+  if ($body) {
+    $res = $self->ua->post($self->api_url.$path, {
+      content => $J->encode($body),
+    });
+  }
+  else {
+    $res = $self->ua->get($self->api_url.$path);
+  }
+  return ($res->{status}, $J->decode($res->{content}));
+}
+
 sub find_dev {
   my ($self, $dist, $author) = @_;
   log_debug { "finding dev release for $dist by ".($author//'unknown author') };
@@ -185,6 +199,84 @@ sub dist_lookup {
   return wantarray ? ($release, $author, $is_latest) : $release;
 }
 
+sub mod_lookup {
+  my ($self, $module) = @_;
+  log_debug { "looking up release for $module" };
+  my ($status, $content) = $self->api_call('module/'.url_encode($module));
+  my $latest = $status == 200 && $content;
+  Dlog_debug { "latest release for $module: $_" } $latest;
+  return $module
+    if $latest;
+  my $query = {
+    query => {
+      bool => {
+        must => [
+          { term => { indexed    => 1 } },
+          {
+            or => [
+              {
+                nested => {
+                  path   => "module",
+                  filter => {
+                    and => [
+                      { term => { "module.name" => $module } },
+                    ],
+                  },
+                },
+              },
+              { term => { documentation => $module } },
+            ],
+          },
+        ],
+        should => [
+          { term => { documentation => $module } },
+          {
+            nested => {
+              path   => 'module',
+              filter => {
+                and => [
+                  { term => { 'module.name' => $module } },
+                  { exists => { field => 'module.associated_pod' } },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+    sort => [
+      '_score',
+      { 'version_numified' => { order => 'desc' } },
+      { 'date'             => { order => 'desc' } },
+      { 'mime'             => { order => 'asc' } },
+      { 'stat.mtime'       => { order => 'desc' } }
+    ],
+    size => 100,
+    fields => [qw(
+      path
+      release
+      author
+      documentation
+    )],
+    _source => [qw(
+      module.name
+    )],
+  };
+
+  my $res = $self->api_call('file/_search?search_type=dfs_query_then_fetch', $query);
+  Dlog_debug { "found candidates: $_" } $res;
+
+  my @candidates = map +{ %{$_->{fields}}, %{$_->{_source}||{}} }, @{$res->{hits}{hits}||[]};
+  my ($file) = grep {;
+    (!$_->{documentation} || $_->{documentation} eq $module )
+    && grep { $_->{name} eq $module } @{ $_->{module} || [] }
+  } @candidates;
+
+  $file ||= shift @candidates or return $module;
+
+  return join('/', 'release', @{$file}{qw(author release path)});
+}
+
 sub has_pod {
   my ($self, $author, $dist, $path) = @_;
   log_debug { "checking file/$author/$dist/$path" };
@@ -220,18 +312,22 @@ sub rewrite {
       return $self->tilde("$1");
     }
     elsif (m{^/perldoc(?:/([^/]+)(/.*)?)?$}) {
+      my $mod;
       if (@params == 1) {
-        return [ 301, '/pod/' . $params[0] ];
+        $mod = $params[0];
       }
       elsif (@params || length $2) {
         return [ 404 ];
       }
       elsif (length $1) {
-        return [ 301, '/pod/' . $1 ];
+        $mod = $1;
       }
       else {
         return [ 301, '/' ];
       }
+      my $pod = $self->mod_lookup($mod);
+      my $status = $pod =~ m{/} ? 302 : 301;
+      return [ $status, '/pod/' . $pod ];
     }
     elsif (m{^/src/(.*)$}) {
       return length $1 ? $self->src("$1") : [ 301, '/' ];
