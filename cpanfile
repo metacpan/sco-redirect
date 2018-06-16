@@ -10,6 +10,7 @@ requires 'JSON::MaybeXS';
 requires 'Log::Contextual';
 requires 'Log::Log4perl';
 requires 'Moo';
+requires 'Mozilla::CA';
 requires 'Net::SSLeay' => 1.49;
 requires 'Plack::Builder';
 requires 'Plack::Request';
