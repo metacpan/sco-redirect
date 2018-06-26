@@ -378,7 +378,7 @@ sub rewrite {
     }
     elsif (m{^/api(?:/(.*))?$}) {
       return [ 301, 'https://fastapi.metacpan.org/' ]
-        if !defined $1;
+        if !length $1;
       return $self->api("$1");
     }
     elsif (m{^/search(?:/.*)?$}) {
