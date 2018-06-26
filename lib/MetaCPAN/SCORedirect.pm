@@ -517,6 +517,46 @@ sub api {
       } grep $_->{status} ne 'backpan', @$releases ],
     }];
   }
+  elsif ( $type eq 'cpan_stats' ) {
+    my ($upload_status, $upload_content) = $self->api_call('release/_search', {
+      size => 0,
+      query => {
+        bool => {
+          must_not => {
+            term => { status => 'backpan' },
+          },
+        },
+      },
+    });
+    my ($dist_status, $dist_content) = $self->api_call('distribution/_search', {
+      size => 0,
+      query => { match_all => {} },
+    });
+    my ($module_status, $module_content) = $self->api_call('file/_search', {
+      size => 0,
+      query => {
+        bool => {
+          must => [
+            { term => { mime => 'text/x-script.perl-module' } },
+            { term => { 'status' => 'latest' } },
+          ],
+        },
+      },
+    });
+    my ($author_status, $author_content) = $self->api_call('author/_search', {
+      size => 0,
+      query => { match_all => {} },
+    });
+
+    return [
+      200, undef, {
+        uploads => $upload_content->{hits}{total},
+        distributions => $dist_content->{hits}{total},
+        modules => $module_content->{hits}{total},
+        authors => $author_content->{hits}{total},
+      },
+    ];
+  }
   else {
     return [ 404, undef, { error => 'Not found' } ];
   }

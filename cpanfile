@@ -19,3 +19,4 @@ requires 'URL::Encode::XS';
 requires 'WWW::Form::UrlEncoded';
 test_requires 'Test::More';
 test_requires 'Test::Differences';
+test_requires 'Test::Deep';
