@@ -46,6 +46,7 @@ my @checks = (
     => [ 301, 'https://metacpan.org/search?q=Moo&p=2&size=100' ],
   '/search/guff?m=all&q=Moo&n=100&s=101'
     => [ 301, 'https://metacpan.org/search?q=Moo&p=2&size=100' ],
+  '/search'                                       => [ 301, 'https://metacpan.org/' ],
   '/rss/search.rss'                               => [ 301, 'https://metacpan.org/feed/recent?format=rss' ],
   '/rss/search.rss/guff'                          => [ 404 ],
 

@@ -386,7 +386,7 @@ sub rewrite {
     }
     elsif (m{^/search(?:/.*)?$}) {
       my %params = @params;
-      my $query = $params{q} // $params{query} // return undef;
+      my $query = $params{q} // $params{query} // return [ 301, '/' ];
       my $mode = $params{m} // $params{mode} // 'all'; # all, dist, module, author
       my $page_size = $params{n} || 100;
       my $page = int((($params{s} // 1) - 1) / ($page_size) + 1);
