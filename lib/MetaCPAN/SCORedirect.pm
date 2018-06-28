@@ -386,8 +386,24 @@ sub rewrite {
     }
     elsif (m{^/search(?:/.*)?$}) {
       my %params = @params;
-      my $query = $params{q} // $params{query} // return [ 301, '/' ];
-      my $mode = $params{m} // $params{mode} // 'all'; # all, dist, module, author
+      my $query;
+      my $mode;
+      if (exists $params{module}) {
+        $query = $params{module};
+        $mode = 'module';
+      }
+      elsif (exists $params{author}) {
+        $query = $params{author};
+        $mode = 'author';
+      }
+      elsif (exists $params{dist}) {
+        $query = $params{dist};
+        $mode = 'dist';
+      }
+      else {
+        $query = $params{q} // $params{query} // return [ 301, '/' ];
+        $mode = $params{m} // $params{mode} // 'all'; # all, dist, module, author
+      }
       my $page_size = $params{n} || 100;
       my $page = int((($params{s} // 1) - 1) / ($page_size) + 1);
       my $format = uc($params{format} // '');

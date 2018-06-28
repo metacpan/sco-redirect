@@ -46,6 +46,12 @@ my @checks = (
     => [ 301, 'https://metacpan.org/search?q=Moo&p=2&size=100' ],
   '/search/guff?m=all&q=Moo&n=100&s=101'
     => [ 301, 'https://metacpan.org/search?q=Moo&p=2&size=100' ],
+  '/search?module=Moo'
+    => [ 301, 'https://metacpan.org/search?q=module%3AMoo' ],
+  '/search?dist=Moo'
+    => [ 301, 'https://metacpan.org/search?q=dist%3AMoo' ],
+  '/search?author=Moo'
+    => [ 301, 'https://metacpan.org/search?q=Moo' ],
   '/search'                                       => [ 301, 'https://metacpan.org/' ],
   '/rss/search.rss'                               => [ 301, 'https://metacpan.org/feed/recent?format=rss' ],
   '/rss/search.rss/guff'                          => [ 404 ],
