@@ -353,6 +353,18 @@ sub rewrite {
       }
       return [ 301, '/recent' ];
     }
+    elsif (m{^/redirect$}) {
+      my %params = @params;
+      my $url = $params{url} // return [ 301, '/' ];
+
+      # only accept local urls
+      if ($url !~ m{^/(?!/)}) {
+        return [ 301, '/' ];
+      }
+
+      my ($path, $query) = split /\?/, $url, 2;
+      return $self->rewrite_url($path, $query);
+    }
     elsif (m{^/diff$}) {
       my %params = @params;
       return [ 404 ]
