@@ -26,7 +26,7 @@ while (@checks) {
 sub cmp_gte {
   my $num = shift;
   Test::Deep::code(sub {
-    $_[0] >= $num ? 1 : ("not greater than or equal to $num");
+    $_[0] >= $num ? 1 : (0, "not greater than or equal to $num");
   });
 }
 
