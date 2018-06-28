@@ -340,6 +340,9 @@ sub rewrite {
     elsif (m{^/dist(?:/(.*))?$}) {
       return length $1 ? $self->dist("$1") : [ 301, '/' ];
     }
+    elsif (m{^/tools(?:/([^/]*))?$}) {
+      return length $1 ? $self->dist("$1") : [ 301, '/' ];
+    }
     elsif (m{^/CPAN(?:/(.*))?$}) {
       return [ 301, 'https://cpan.metacpan.org/' . (length $1 ? $1 : '') ];
     }

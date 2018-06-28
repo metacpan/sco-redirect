@@ -103,6 +103,11 @@ my @checks = (
     => [ 302, 'https://metacpan.org/pod/release/JROBINSON/DBIx-Class-Tutorial-0.0001/lib/DBIx/Class/Tutorial.pod' ],
   '/perldoc/DBIx::Class::Tutorial'
     => [ 302, 'https://metacpan.org/pod/release/JROBINSON/DBIx-Class-Tutorial-0.0001/lib/DBIx/Class/Tutorial.pod' ],
+
+  '/tools'                                         => [ 301, 'https://metacpan.org/' ],
+  '/tools/'                                        => [ 301, 'https://metacpan.org/' ],
+  '/tools/Moo'                                     => [ 301, 'https://metacpan.org/release/Moo' ],
+  '/tools/Moo-2.003004'                            => [ 301, 'https://metacpan.org/release/HAARG/Moo-2.003004' ],
 );
 
 my $redirect = MetaCPAN::SCORedirect->new;
