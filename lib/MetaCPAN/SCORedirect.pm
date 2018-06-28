@@ -540,6 +540,7 @@ sub api {
       query => {
         bool => {
           must => [
+            { term => { indexed => JSON::MaybeXS->true } },
             { term => { mime => 'text/x-script.perl-module' } },
             { term => { 'status' => 'latest' } },
           ],

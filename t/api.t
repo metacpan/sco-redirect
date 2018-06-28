@@ -38,7 +38,7 @@ sub cmp_gte {
   cmp_deeply $got->[2], {
     authors => cmp_gte(13530),
     distributions => cmp_gte(38519),
-    modules => cmp_gte(241845),
+    modules => cmp_gte(174267),
     uploads => cmp_gte(127486),
   }, 'correct content for '.$url;
 }
