@@ -116,9 +116,9 @@ my @checks = (
   '/tools/Moo'                                     => [ 301, 'https://metacpan.org/release/Moo' ],
   '/tools/Moo-2.003004'                            => [ 301, 'https://metacpan.org/release/HAARG/Moo-2.003004' ],
 
-  'redirect?url=%2F%7Eaallan%2FAstro-FITS-Header-2.6.2%2F'
+  '/redirect?url=%2F%7Eaallan%2FAstro-FITS-Header-2.6.2%2F'
     => [ 301, 'https://metacpan.org/release/AALLAN/Astro-FITS-Header-2.6.2' ],
-  'redirect?url=/~hernan/Image-Simple-Gradient-0.03/'
+  '/redirect?url=/~hernan/Image-Simple-Gradient-0.03/'
     => [ 301, 'https://metacpan.org/release/HERNAN/Image-Simple-Gradient-0.03' ],
 );
 
