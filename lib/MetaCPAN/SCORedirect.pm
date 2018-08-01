@@ -78,8 +78,19 @@ sub _build_app {
 
 
 sub is_dist {
-  my $info = CPAN::DistnameInfo->new($_[0].'.tar.gz');
-  return !defined $info->version;
+  my ($self, $dist) = @_;
+  my $res = $self->api_call('distribution', {
+    query => {
+      term => {
+        name => $dist,
+      },
+    },
+    sort => [ { date => 'desc' } ],
+    size => 1,
+    fields => [ qw(name author) ],
+  });
+
+  return !!@{ $res->{hits}{hits} };
 }
 
 sub api_call {
@@ -137,7 +148,7 @@ sub dist_lookup {
   my ($self, $dist, $author) = @_;
   my $release;
   my $is_latest;
-  if (is_dist($dist)) {
+  if ($self->is_dist($dist)) {
     log_debug { "looking up release for $dist by ".($author // 'unknown') };
     my $res = $self->ua->get($self->api_url.'release/latest_by_distribution/'.url_encode($dist));
     my $latest = $res->{status} == 200 && $J->decode($res->{content})->{release};
@@ -643,7 +654,7 @@ sub dist_path {
 
   (my $release, $author, my $is_latest) = $self->dist_lookup($dist, $author);
 
-  if (is_dist($dist) && $is_latest) {
+  if ($self->is_dist($dist) && $is_latest) {
     return [ 301, "/release/$dist" ]
       if !defined $file_path;
 

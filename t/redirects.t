@@ -120,6 +120,8 @@ my @checks = (
     => [ 301, 'https://metacpan.org/release/AALLAN/Astro-FITS-Header-2.6.2' ],
   '/redirect?url=/~hernan/Image-Simple-Gradient-0.03/'
     => [ 301, 'https://metacpan.org/release/HERNAN/Image-Simple-Gradient-0.03' ],
+
+  '/dist/Dancer2/lib/Dancer2/Manual.pod'           => [ 301, 'https://metacpan.org/pod/distribution/Dancer2/lib/Dancer2/Manual.pod' ],
 );
 
 my $redirect = MetaCPAN::SCORedirect->new;
