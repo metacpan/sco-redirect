@@ -218,6 +218,11 @@ sub dist_lookup {
 sub mod_lookup {
   my ($self, $module) = @_;
   log_debug { "looking up release for $module" };
+
+  # if it's invalid, just let metacpan handle it
+  return $module
+    if $module !~ /\A\w+(?:::\w+)+\z/;
+
   my ($status, $content) = $self->api_call('module/'.url_encode($module));
   my $latest = $status == 200 && $content;
   Dlog_debug { "latest release for $module: $_" } $latest;
