@@ -9,7 +9,7 @@ use HTTP::Tiny ();
 use WWW::Form::UrlEncoded qw(parse_urlencoded build_urlencoded);
 use CPAN::DistnameInfo ();
 use JSON::MaybeXS ();
-use URL::Encode qw(url_encode);
+use URL::Encode qw(url_encode url_decode);
 use Log::Contextual::Easy::Default;
 
 use Moo;
@@ -341,7 +341,7 @@ sub rewrite {
       else {
         return [ 301, '/' ];
       }
-      my $pod = $self->mod_lookup($mod);
+      my $pod = $self->mod_lookup(url_decode($mod));
       my $status = $pod =~ m{/} ? 302 : 301;
       return [ $status, '/pod/' . $pod ];
     }
