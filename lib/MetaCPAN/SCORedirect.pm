@@ -467,11 +467,11 @@ sub rewrite {
       return [ 301,
           m{^/$}                        ? '/'
         : m{^/mirror(?:/.*)?$}          ? '/mirrors'
-        : m{^/uploads\.rdf(?:/.*)?}     ? '/feed/recent'
+        : m{^/uploads\.rdf(?:/.*)?}     ? '/recent.rdf'
         : m{^/faq\.html(?:/.*)?$}       ? '/about/faq'
         : m{^/feedback(?:/.*)?$}        ? '/about/contact'
         : m{^/pod2html(?:/.*)?$}        ? '/pod2html'
-        : m{^/rss/search\.rss$}         ? '/feed/recent?format=rss'
+        : m{^/rss/search\.rss$}         ? '/recent.rss'
         : return [ 404 ]
       ];
     }

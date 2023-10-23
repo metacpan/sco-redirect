@@ -17,9 +17,9 @@ my @checks = (
   '/mirror'                                       => [ 301, 'https://metacpan.org/mirrors' ],
   '/mirror/guff'                                  => [ 301, 'https://metacpan.org/mirrors' ],
   '/mirror?guff'                                  => [ 301, 'https://metacpan.org/mirrors' ],
-  '/uploads.rdf'                                  => [ 301, 'https://metacpan.org/feed/recent' ],
-  '/uploads.rdf/guff'                             => [ 301, 'https://metacpan.org/feed/recent' ],
-  '/uploads.rdf?guff'                             => [ 301, 'https://metacpan.org/feed/recent' ],
+  '/uploads.rdf'                                  => [ 301, 'https://metacpan.org/recent.rdf' ],
+  '/uploads.rdf/guff'                             => [ 301, 'https://metacpan.org/recent.rdf' ],
+  '/uploads.rdf?guff'                             => [ 301, 'https://metacpan.org/recent.rdf' ],
   '/faq.html'                                     => [ 301, 'https://metacpan.org/about/faq' ],
   '/faq.html/guff'                                => [ 301, 'https://metacpan.org/about/faq' ],
   '/feedback'                                     => [ 301, 'https://metacpan.org/about/contact' ],
@@ -53,7 +53,7 @@ my @checks = (
   '/search?author=Moo'
     => [ 301, 'https://metacpan.org/search?q=Moo' ],
   '/search'                                       => [ 301, 'https://metacpan.org/' ],
-  '/rss/search.rss'                               => [ 301, 'https://metacpan.org/feed/recent?format=rss' ],
+  '/rss/search.rss'                               => [ 301, 'https://metacpan.org/recent.rss' ],
   '/rss/search.rss/guff'                          => [ 404 ],
 
   '/author/haarg'                                 => [ 301, 'https://metacpan.org/author/HAARG' ],
