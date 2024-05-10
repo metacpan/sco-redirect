@@ -45,6 +45,11 @@ EOT
 USER metacpan
 
 ################### Production Server
+FROM develop AS test
+
+CMD [ "prove", "-r", "-l", "-j", "2", "t" ]
+
+################### Production Server
 FROM server AS production
 
 USER metacpan
