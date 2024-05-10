@@ -2,7 +2,6 @@ requires 'CPAN::DistnameInfo';
 requires 'Config::General';
 requires 'Config::ZOMG';
 requires 'Cpanel::JSON::XS';
-requires 'Gazelle';
 requires 'HTML::Entities';
 requires 'HTTP::Tiny';
 requires 'IO::Socket::SSL' => 1.42;
