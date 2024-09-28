@@ -87,7 +87,7 @@ sub is_dist {
     },
     sort => [ { date => 'desc' } ],
     size => 1,
-    fields => [ qw(name author) ],
+    _source => [ qw(name author) ],
   });
 
   return !!@{ $res->{hits}{hits} };
@@ -129,7 +129,7 @@ sub find_dev {
     },
     sort => [ { date => 'desc' } ],
     size => 1,
-    fields => [ qw(name author) ],
+    _source => [ qw(name author) ],
   };
   my $res = $self->ua->post($self->api_url.'release', {
     content => $J->encode($query),
@@ -139,7 +139,7 @@ sub find_dev {
 
   my $rel = $J->decode($res->{content});
   Dlog_debug { "found dev release $_" } $rel;
-  my $release = $rel->{hits}{hits}[0]{fields} or die [ 404 ];
+  my $release = $rel->{hits}{hits}[0]{_source} or die [ 404 ];
 
   return ($release->{name}, $release->{author});
 }
@@ -197,7 +197,7 @@ sub dist_lookup {
         },
         sort => [ { date => 'desc' } ],
         size => 1,
-        fields => [ qw(status author) ],
+        _source => [ qw(status author) ],
       };
       my $json = $J->encode($query);
       my $res = $self->ua->post($self->api_url.'release', {
@@ -206,7 +206,7 @@ sub dist_lookup {
       die [ $res->{status} ]
         unless $res->{status} == 200;
 
-      my $rel = $J->decode($res->{content})->{hits}{hits}[0]{fields};
+      my $rel = $J->decode($res->{content})->{hits}{hits}[0]{_source};
       Dlog_debug { "found release from $release: $_" } $rel;
       $author ||= $rel->{author};
     }
@@ -273,21 +273,19 @@ sub mod_lookup {
       { 'stat.mtime'       => { order => 'desc' } }
     ],
     size => 100,
-    fields => [qw(
-      path
-      release
+    _source => [qw(
       author
       documentation
-    )],
-    _source => [qw(
       module.name
+      path
+      release
     )],
   };
 
   my $res = $self->api_call('file/_search?search_type=dfs_query_then_fetch', $query);
   Dlog_debug { "found candidates: $_" } $res;
 
-  my @candidates = map +{ %{$_->{fields}}, %{$_->{_source}||{}} }, @{$res->{hits}{hits}||[]};
+  my @candidates = map $_->{_source}, @{$res->{hits}{hits}||[]};
   my ($file) = grep {;
     (!$_->{documentation} || $_->{documentation} eq $module )
     && grep { $_->{name} eq $module } @{ $_->{module} || [] }
