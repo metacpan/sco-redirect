@@ -79,18 +79,9 @@ sub _build_app {
 
 sub is_dist {
   my ($self, $dist) = @_;
-  my $res = $self->api_call('distribution', {
-    query => {
-      term => {
-        name => $dist,
-      },
-    },
-    sort => [ { date => 'desc' } ],
-    size => 1,
-    _source => [ qw(name author) ],
-  });
+  my $res = $self->ua->get($self->api_url.'distribution/'.url_encode($dist));
 
-  return !!@{ $res->{hits}{hits} };
+  return $res->{status} == 200;
 }
 
 sub api_call {
@@ -148,7 +139,8 @@ sub dist_lookup {
   my ($self, $dist, $author) = @_;
   my $release;
   my $is_latest;
-  if ($self->is_dist($dist)) {
+  my $is_dist = $self->is_dist($dist);
+  if ($is_dist) {
     log_debug { "looking up release for $dist by ".($author // 'unknown') };
     my $res = $self->ua->get($self->api_url.'release/latest_by_distribution/'.url_encode($dist));
     my $latest = $res->{status} == 200 && $J->decode($res->{content})->{release};
@@ -212,7 +204,7 @@ sub dist_lookup {
     }
   }
   log_debug { "found $author $release ".($is_latest ? 'latest' : 'not latest') };
-  return wantarray ? ($release, $author, $is_latest) : $release;
+  return wantarray ? ($release, $author, $is_latest, $is_dist) : $release;
 }
 
 sub mod_lookup {
@@ -655,9 +647,9 @@ sub dist {
 sub dist_path {
   my ($self, $dist, $author, $file_path) = @_;
 
-  (my $release, $author, my $is_latest) = $self->dist_lookup($dist, $author);
+  (my $release, $author, my $is_latest, my $is_dist) = $self->dist_lookup($dist, $author);
 
-  if ($self->is_dist($dist) && $is_latest) {
+  if ($is_dist && $is_latest) {
     return [ 301, "/release/$dist" ]
       if !defined $file_path;
 
