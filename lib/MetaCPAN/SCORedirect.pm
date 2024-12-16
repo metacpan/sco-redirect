@@ -79,9 +79,9 @@ sub _build_app {
 
 sub is_dist {
   my ($self, $dist) = @_;
-  my $res = $self->ua->get($self->api_url.'distribution/'.url_encode($dist));
+  my ($status) = $self->api_call('distribution/'.url_encode($dist));
 
-  return $res->{status} == 200;
+  return $status == 200;
 }
 
 sub api_call {
@@ -142,8 +142,8 @@ sub dist_lookup {
   my $is_dist = $self->is_dist($dist);
   if ($is_dist) {
     log_debug { "looking up release for $dist by ".($author // 'unknown') };
-    my $res = $self->ua->get($self->api_url.'release/latest_by_distribution/'.url_encode($dist));
-    my $latest = $res->{status} == 200 && $J->decode($res->{content})->{release};
+    my ($status, $body) = $self->api_call('release/latest_by_distribution/'.url_encode($dist));
+    my $latest = $status == 200 && $body->{release};
     Dlog_debug { "latest release for $dist: $_" } $latest;
     if ($author) {
       if ($latest && $latest->{author} eq $author) {
@@ -291,10 +291,9 @@ sub mod_lookup {
 sub has_pod {
   my ($self, $author, $dist, $path) = @_;
   log_debug { "checking file/$author/$dist/$path" };
-  my $res = $self->ua->get($self->api_url."file/$author/$dist/$path");
+  my ($status, $file) = $self->api_call("file/$author/$dist/$path");
   return 0
-    unless $res->{status} == 200;
-  my $file = $J->decode($res->{content});
+    unless $status == 200;
   Dlog_debug { "checking for pod lines in $author/$dist/$path: $_" } $file->{pod_lines};
   return !!($file->{pod_lines} && @{$file->{pod_lines}});
 }
@@ -478,14 +477,13 @@ sub api {
   my ($self, $url) = @_;
   my ($type, $id) = split m{/}, $url, 2;
   if ($type eq 'module') {
-    my $res = $self->ua->get('https://fastapi.metacpan.org/v1/module/'.url_encode($id));
-    return [ $res->{status} ]
-      unless $res->{status} == 200;
-    my $data = $J->decode($res->{content});
+    my ($status, $data) = $self->api_call('module/'.url_encode($id));
+    return [ $status ]
+      unless $status == 200;
     my $url = $data->{download_url};
     my $author = $data->{author};
     $url =~ s{.*?/authors/id/./../\Q$author\E/}{};
-    return [ $res->{status}, undef, {
+    return [ $status, undef, {
       status        => ($data->{maturity} eq 'released' ? 'stable' : 'testing'),
       authorized    => $data->{authorized},
       module        => $id,
@@ -497,10 +495,9 @@ sub api {
     } ];
   }
   elsif ( $type eq 'dist' ) {
-    my $res = $self->ua->get($self->api_url.'release/versions/'.url_encode($id));
-    return [ $res->{status} ]
-      unless $res->{status} == 200;
-    my $data = $J->decode($res->{content});
+    my ($status, $data) = $self->api_call('release/versions/'.url_encode($id));
+    return [ $status ]
+      unless $status == 200;
     my $latest;
     my @releases = map {
       my $rel = $_;
@@ -521,19 +518,18 @@ sub api {
         cpanid      => $author,
       }
     } grep $_->{status} ne 'backpan', @{$data->{releases}};
-    return [ $res->{status}, undef, {
+    return [ $status, undef, {
       latest => $latest,
       releases => \@releases,
     } ];
   }
   elsif ( $type eq 'author' ) {
-    my $author_res = $self->ua->get($self->api_url.'author/'.url_encode($id));
-    return [ $author_res->{status} ]
-      unless $author_res->{status} == 200;
-    my $author = $J->decode($author_res->{content});
-    my $release_res = $self->ua->get($self->api_url.'release/all_by_author/'.url_encode($id));
-    my $releases = $release_res->{status} == 200 ? $J->decode($release_res->{content})->{releases} : [];
-    return [ $author_res->{status}, undef, {
+    my ($status, $author) = $self->api_call('author/'.url_encode($id));
+    return [ $status ]
+      unless $status == 200;
+    my ($release_status, $body) = $self->api_call('release/all_by_author/'.url_encode($id));
+    my $releases = $release_status == 200 ? $body->{releases} : [];
+    return [ $status, undef, {
       cpanid => $author->{pauseid},
       name => $author->{name},
       releases => [ map {
