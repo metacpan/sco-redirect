@@ -637,9 +637,8 @@ sub api {
     }
     elsif ( $type eq 'cpan_stats' ) {
         my ( $upload_status, $upload_content ) = $self->api_call(
-            'release/_search',
+            'release/_count',
             {
-                size  => 0,
                 query => {
                     bool => {
                         must_not => {
@@ -649,17 +648,11 @@ sub api {
                 },
             }
         );
-        my ( $dist_status, $dist_content ) = $self->api_call(
-            'distribution/_search',
-            {
-                size  => 0,
-                query => { match_all => {} },
-            }
-        );
+        my ( $dist_status, $dist_content )
+            = $self->api_call( 'distribution/_count', );
         my ( $module_status, $module_content ) = $self->api_call(
-            'file/_search',
+            'file/_count',
             {
-                size  => 0,
                 query => {
                     bool => {
                         must => [
@@ -674,21 +667,16 @@ sub api {
                 },
             }
         );
-        my ( $author_status, $author_content ) = $self->api_call(
-            'author/_search',
-            {
-                size  => 0,
-                query => { match_all => {} },
-            }
-        );
+        my ( $author_status, $author_content )
+            = $self->api_call( 'author/_count', );
 
         return [
             200, undef,
             {
-                uploads       => $upload_content->{hits}{total},
-                distributions => $dist_content->{hits}{total},
-                modules       => $module_content->{hits}{total},
-                authors       => $author_content->{hits}{total},
+                uploads       => $upload_content->{count},
+                distributions => $dist_content->{count},
+                modules       => $module_content->{count},
+                authors       => $author_content->{count},
             },
         ];
     }
