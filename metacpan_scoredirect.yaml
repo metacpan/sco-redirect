@@ -1,0 +1,6 @@
+raw_source_link:  1
+api_url:          https://fastapi.metacpan.org/v1/
+metacpan_url:     https://metacpan.org/
+
+ua_options:
+  verify_SSL: 1
