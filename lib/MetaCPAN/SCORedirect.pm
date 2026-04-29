@@ -250,41 +250,50 @@ sub mod_lookup {
         query => {
             bool => {
                 must => [
-                    { term => { indexed => 1 } },
+                    { term => { indexed => JSON::MaybeXS->true } },
                     {
-                        or => [
-                            {
-                                nested => {
-                                    path   => "module",
-                                    filter => {
-                                        and => [
-                                            {
-                                                term => {
-                                                    "module.name" => $module
-                                                }
+                        bool => {
+                            should => [
+                                {
+                                    nested => {
+                                        path  => "module",
+                                        query => {
+                                            bool => {
+                                                must => [
+                                                    { term =>
+                                                            { "module.name"
+                                                                => $module }
+                                                    },
+                                                ]
                                             },
-                                        ],
+                                        },
                                     },
                                 },
-                            },
-                            { term => { documentation => $module } },
-                        ],
+                                { term => { documentation => $module } },
+                            ],
+                        }
                     },
                 ],
                 should => [
                     { term => { documentation => $module } },
                     {
                         nested => {
-                            path   => 'module',
-                            filter => {
-                                and => [
-                                    { term => { 'module.name' => $module } },
-                                    {
-                                        exists => {
-                                            field => 'module.associated_pod'
-                                        }
-                                    },
-                                ],
+                            path  => 'module',
+                            query => {
+                                bool => {
+                                    must => [
+                                        {
+                                            term =>
+                                                { 'module.name' => $module }
+                                        },
+                                        {
+                                            exists => {
+                                                field =>
+                                                    'module.associated_pod'
+                                            }
+                                        },
+                                    ],
+                                }
                             },
                         },
                     },
