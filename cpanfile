@@ -16,6 +16,15 @@ requires 'Plack::Request';
 requires 'URL::Encode';
 requires 'URL::Encode::XS';
 requires 'WWW::Form::UrlEncoded';
-test_requires 'Test::More';
-test_requires 'Test::Differences';
-test_requires 'Test::Deep';
+
+on test => sub {
+    requires 'Test::More';
+    requires 'Test::Differences';
+    requires 'Test::Deep';
+};
+
+on develop => sub {
+    requires 'Perl::Critic';
+    requires 'Perl::Tidy';
+    requires 'App::perlimports';
+};
