@@ -25,7 +25,7 @@ jobs:
         env:
           PULL_REQUEST: ${{ github.event.pull_request.number }}
         with:
-          github-token: ${{ inputs.token }}
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             const pr = process.env.PULL_REQUEST;
 
