@@ -20,35 +20,8 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           permissions-pull-requests: write
       - name: Enable Pull Request Auto Merge
-        uses: actions/github-script@v9
         id: dispatch
         env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
           PULL_REQUEST: ${{ github.event.pull_request.number }}
-        with:
-          github-token: ${{ steps.app-token.outputs.token }}
-          script: |
-            const pr = process.env.PULL_REQUEST;
-
-            const { data: pullRequest } = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr,
-            });
-
-            const mutation = `
-              mutation EnableAutoMerge {
-                enablePullRequestAutoMerge(input: {
-                  pullRequestId: "${pullRequest.node_id}",
-                  mergeMethod: SQUASH
-                }) {
-                  clientMutationId
-                }
-              }
-            `;
-
-            try {
-              await github.graphql(mutation);
-              console.log("Auto-merge with squash successfully enabled");
-            } catch (error) {
-              console.error("Failed to enable auto-merge with squash:", error);
-            }
+        run: gh pr merge --merge --auto "$PULL_REQUEST"
