@@ -16,6 +16,8 @@ jobs:
     if: github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'build-container')
     runs-on: ubuntu-22.04
     name: Docker Build and Push
+    permissions:
+      packages: write
     steps:
       - name: Generate Auth Token
         uses: actions/create-github-app-token@v3
@@ -25,7 +27,6 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: metacpan
           permission-contents: read
-          permission-packages: write
       - uses: actions/checkout@v6
         with:
           token: ${{ steps.app-token.outputs.token }}
