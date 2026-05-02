@@ -27,6 +27,7 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: metacpan
           permission-contents: read
+          permission-actions: write
       - uses: actions/checkout@v6
         with:
           token: ${{ steps.app-token.outputs.token }}
