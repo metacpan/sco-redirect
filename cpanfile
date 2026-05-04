@@ -1,5 +1,4 @@
 requires 'CPAN::DistnameInfo';
-requires 'Config::General';
 requires 'Config::ZOMG';
 requires 'Cpanel::JSON::XS';
 requires 'HTML::Entities';
@@ -16,6 +15,7 @@ requires 'Plack::Request';
 requires 'URL::Encode';
 requires 'URL::Encode::XS';
 requires 'WWW::Form::UrlEncoded';
+requires 'YAML::XS';
 
 on test => sub {
     requires 'Test::More';
