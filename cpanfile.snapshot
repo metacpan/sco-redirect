@@ -1270,11 +1270,11 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
-  Log-Log4perl-1.57
-    pathname: E/ET/ETJ/Log-Log4perl-1.57.tar.gz
+  Log-Log4perl-1.58
+    pathname: M/MS/MSCHILLI/Log-Log4perl-1.58.tar.gz
     provides:
       L4pResurrectable 0.01
-      Log::Log4perl 1.57
+      Log::Log4perl 1.58
       Log::Log4perl::Appender undef
       Log::Log4perl::Appender::Buffer 1.53
       Log::Log4perl::Appender::DBI undef
@@ -1490,10 +1490,10 @@ DISTRIBUTIONS
       Moo 2.004000
       Moo::Role 0
       perl 5.008
-  Mozilla-CA-20250602
-    pathname: L/LW/LWP/Mozilla-CA-20250602.tar.gz
+  Mozilla-CA-20260813
+    pathname: L/LW/LWP/Mozilla-CA-20260813.tar.gz
     provides:
-      Mozilla::CA 20250602
+      Mozilla::CA 20260813
     requirements:
       ExtUtils::MakeMaker 0
   Net-SSLeay-1.96
