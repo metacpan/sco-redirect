@@ -237,12 +237,12 @@ DISTRIBUTIONS
       Module::Build::Tiny 0.035
       URI::Escape 0
       perl 5.008001
-  Cpanel-JSON-XS-4.81
-    pathname: R/RU/RURBAN/Cpanel-JSON-XS-4.81.tar.gz
+  Cpanel-JSON-XS-4.82
+    pathname: R/RU/RURBAN/Cpanel-JSON-XS-4.82.tar.gz
     provides:
-      Cpanel::JSON::XS 4.81
-      Cpanel::JSON::XS::Boolean 4.81
-      Cpanel::JSON::XS::Type 4.81
+      Cpanel::JSON::XS 4.82
+      Cpanel::JSON::XS::Boolean 4.82
+      Cpanel::JSON::XS::Type 4.82
     requirements:
       Carp 0
       Config 0
@@ -992,16 +992,16 @@ DISTRIBUTIONS
       perl 5.012
       strict 0
       warnings 0
-  HTML-Parser-3.86
-    pathname: O/OA/OALDERS/HTML-Parser-3.86.tar.gz
+  HTML-Parser-3.87
+    pathname: O/OA/OALDERS/HTML-Parser-3.87.tar.gz
     provides:
-      HTML::Entities 3.86
-      HTML::Filter 3.86
-      HTML::HeadParser 3.86
-      HTML::LinkExtor 3.86
-      HTML::Parser 3.86
-      HTML::PullParser 3.86
-      HTML::TokeParser 3.86
+      HTML::Entities 3.87
+      HTML::Filter 3.87
+      HTML::HeadParser 3.87
+      HTML::LinkExtor 3.87
+      HTML::Parser 3.87
+      HTML::PullParser 3.87
+      HTML::TokeParser 3.87
     requirements:
       Carp 0
       Exporter 0
